@@ -25,6 +25,7 @@ before(async () => {
     FEEDPILOT_MAX_POSTS_PER_DAY: "3",
     FEEDPILOT_MAX_REPLIES_PER_HOUR: "2",
     FEEDPILOT_SKIP_LAUNCHCTL: "1",
+    FEEDPILOT_HELPER_PLATFORM: "darwin",
     FEEDPILOT_LAUNCHAGENTS_DIR: agentsDir,
   });
 });
@@ -205,7 +206,7 @@ test("the background helper installs only with the code from its explanation", a
   const body = await fs.readFile(plist, "utf8");
   assert.match(body, /dist\/worker\.js/);
   assert.match(body, /<key>FEEDPILOT_DATA_DIR<\/key>/);
-  execFileSync("plutil", ["-lint", plist]);
+  if (process.platform === "darwin") execFileSync("plutil", ["-lint", plist]);
 
   const reuse = await call(client, "background_helper", { action: "install", confirmation_code: code });
   assert.equal(reuse.isError, true, "a code works once");

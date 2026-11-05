@@ -10,7 +10,7 @@ Feedpilot is free and open source. It runs on your computer and works through in
 - **Several accounts at once.** One preview can hold a post for each of several accounts, each with its own caption, files and time, and you approve them together. Feedpilot works on up to 3 accounts at the same time (change it in the settings), one browser window each. An overview shows every account's day at a glance.
 - **Post and schedule.** Single photos, carousels and reels, with a caption. Post right away or pick a time. Scheduled posts are handed to Instagram's own scheduler, so they go out even when your computer is off.
 - **Test runs.** Fill in every posting step and stop just before Share or Schedule, with a screenshot of the result. Nothing is published.
-- **Background helper (Mac, optional).** For the posts Instagram's scheduler can't take, it sends them on time while Claude Desktop is closed. It is only ever installed after you read what it does and say yes.
+- **Background helper (optional, Mac and Windows).** For the posts Instagram's scheduler can't take, it sends them on time while Claude Desktop is closed. It is only ever installed after you read what it does and say yes.
 
 - **Stats.** Followers, following and each recent post's likes, comments and reel views, refreshed every 6 hours for every account (or on request) and kept as snapshots, so history grows beyond Instagram's 90 days and you can see how fast each post took off in its first day. Compare all accounts side by side.
 
@@ -25,7 +25,7 @@ Feedpilot is free and open source. It runs on your computer and works through in
 2. Double-click it, or drag it into Claude Desktop. Claude Desktop installs it.
 3. Optional: in Claude Desktop's extension settings, choose a different data folder or daily post limit.
 
-You need Claude Desktop on a Mac and Google Chrome. Without Chrome, Feedpilot can use Microsoft Edge, or download Chromium once (about 150 MB) when you ask it to.
+You need Claude Desktop on a Mac or a Windows PC, and Google Chrome or Microsoft Edge (Edge comes with Windows). With neither, Feedpilot can download Chromium once (about 150 MB) when you ask it to.
 
 ## Using it
 
@@ -48,7 +48,7 @@ Before anything is published, Claude shows you a preview with the account, files
 
 ## Where your data lives
 
-Everything is in one folder, `~/Feedpilot` by default:
+Everything is in one folder: by default `~/Feedpilot` on a Mac, `C:\Users\<you>\Feedpilot` on Windows.
 
 - `profiles/` holds one browser profile per account. It contains that account's sign-in, so keep it private.
 - `media/<account>/` is where you can drop photos and videos to post by file name.
@@ -76,19 +76,14 @@ Nothing is sent anywhere except to Instagram, through the browser, and what Clau
 
 ## The background helper
 
-It only matters for posts Feedpilot sends itself (see above). Without it, those go out only while Claude Desktop is open. With it, they go out whenever your Mac is on and you're logged in.
+It only matters for posts Feedpilot sends itself (see above). Without it, those go out only while Claude Desktop is open. With it, they go out whenever your computer is on and you're signed in.
 
-It is a standard macOS launch agent (`~/Library/LaunchAgents/com.feedpilot.worker.plist`) that runs once a minute, checks the queue and exits. It can only publish posts you already approved. Claude must first show you exactly what it installs; installing needs a one-time code from that explanation. Ask Claude to remove it any time, or delete the file.
+It runs once a minute, checks the queue and exits, and it can only publish posts you already approved:
 
-## Limits
+- **Mac:** a standard launch agent, `~/Library/LaunchAgents/com.feedpilot.worker.plist`.
+- **Windows:** a scheduled task named "Feedpilot worker" for your user only, with no admin rights, plus three small files in the data folder's `helper` folder. It starts hidden, so no window flashes.
 
-- Mac only for now. Windows comes later.
-- When Instagram changes its website, some steps can break until Feedpilot is updated. Test runs show where.
-- Posts Feedpilot sends itself (less than 25 minutes ahead, or accounts without Instagram's scheduler) need the computer to be on.
-- Stats are the numbers instagram.com shows the account owner: followers, likes, comments and reel views. Reach, saves and shares aren't on the web for personal accounts; reading them for professional accounts isn't built yet.
-- Messages: text, links and shared posts are read; photos and voice notes show as "[media]". Messages are saved on your computer for analysis unless you turn that off in the settings, and Claude can delete the saved copy.
-- Not tried against the live site yet: sending a DM reply, and replying to, liking or deleting a comment. Reading DMs and comments is tested live.
-- Not in this version: Stories, trial reels, locations, tagging people and collab posts.
+Claude must first show you exactly what it installs; installing needs a one-time code from that explanation. Ask Claude to remove it any time, or delete the file or task yourself.
 
 ## Development
 
@@ -98,7 +93,7 @@ npm test          # builds, then runs the tests with a stand-in for Instagram
 npm run pack:mcpb # builds build/feedpilot.mcpb
 ```
 
-Tests never touch Instagram or your real launch agents. `FEEDPILOT_FAKE_POSTER` swaps in a stand-in poster, and `FEEDPILOT_LAUNCHAGENTS_DIR` with `FEEDPILOT_SKIP_LAUNCHCTL=1` keeps the helper in a temporary folder.
+This works the same on macOS and Windows. Tests never touch Instagram or your system's scheduler: `FEEDPILOT_FAKE_POSTER` swaps in a stand-in poster, `FEEDPILOT_SKIP_SYSTEM_SCHEDULER=1` writes the helper's files without registering them, and `FEEDPILOT_HELPER_PLATFORM` picks which system's helper to build.
 
 ## License
 

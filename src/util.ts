@@ -23,7 +23,16 @@ export async function writeJsonAtomic(file: string, data: unknown): Promise<void
   await ensureDir(path.dirname(file));
   const tmp = `${file}.${process.pid}.tmp`;
   await fs.writeFile(tmp, JSON.stringify(data, null, 2));
-  await fs.rename(tmp, file);
+  // On Windows a file being scanned or read elsewhere can't be replaced for a moment; try again briefly.
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await fs.rename(tmp, file);
+      return;
+    } catch (e: any) {
+      if (attempt >= 10 || !["EPERM", "EBUSY", "EACCES"].includes(e?.code)) throw e;
+      await sleep(50 * (attempt + 1));
+    }
+  }
 }
 
 export async function readJsonLines<T>(file: string): Promise<T[]> {

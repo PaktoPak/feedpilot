@@ -23,6 +23,8 @@ const INSTALLED_BROWSERS: Array<[string, string[]]> = [
       path.join(os.homedir(), "Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
       "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+      // Chrome installed for one Windows user only
+      path.join(process.env.LOCALAPPDATA ?? path.join(os.homedir(), "AppData", "Local"), "Google", "Chrome", "Application", "chrome.exe"),
     ],
   ],
   [
@@ -128,7 +130,8 @@ export async function openProfile(profileDir: string): Promise<{ context: Browse
     return { context, page };
   } catch (e: any) {
     const message = String(e?.message ?? e);
-    if (/ProcessSingleton|SingletonLock|already in use|profile.*in use/i.test(message)) {
+    // Windows hands a second launch on the same profile to the open browser ("existing browser session").
+    if (/ProcessSingleton|SingletonLock|already in use|profile.*in use|existing browser session/i.test(message)) {
       throw new BrowserBusyError("This account's browser window is already open. Close it or wait for the current task to finish.");
     }
     throw e;

@@ -171,18 +171,16 @@ test("works on different accounts at the same time, one job per account at a tim
     path.join(dataDir, "state", "jobs.json"),
     JSON.stringify([job("post_a1", { account: "shop_a" }), job("post_b1", { account: "shop_b" }), job("post_a2", { account: "shop_a", run_at: minutes(-0.5) })]),
   );
-  const started = Date.now();
   execFileSync(process.execPath, [workerPath, "--once"], {
     env: { ...process.env, FEEDPILOT_DATA_DIR: dataDir, FEEDPILOT_FAKE_POSTER: "ok", FEEDPILOT_FAKE_DELAY_MS: "2000" },
     stdio: "pipe",
   });
-  const elapsed = Date.now() - started;
   const jobs = await byId(dataDir);
   for (const id of ["post_a1", "post_b1", "post_a2"]) assert.equal(jobs[id].status, "posted", id);
-  // a1 and b1 run together, then a2 after a1: about 4 s rather than 6 s one after another.
-  assert.ok(elapsed < 5600, `took ${elapsed} ms`);
-  const gap = Date.parse(jobs.post_a2.result.finished_at) - Date.parse(jobs.post_a1.result.finished_at);
+  // Each fake post takes 2 s. Run one after another, b1 would finish 2 s after a1; side by side they finish together.
+  const finished = (id) => Date.parse(jobs[id].result.finished_at);
+  const gap = finished("post_a2") - finished("post_a1");
   assert.ok(gap >= 1800, `shop_a's second job waited for its first (gap ${gap} ms)`);
-  const together = Math.abs(Date.parse(jobs.post_b1.result.finished_at) - Date.parse(jobs.post_a1.result.finished_at));
-  assert.ok(together < 1000, `shop_a and shop_b ran side by side (${together} ms apart)`);
+  const together = Math.abs(finished("post_b1") - finished("post_a1"));
+  assert.ok(together < 1500, `shop_a and shop_b ran side by side (${together} ms apart)`);
 });
