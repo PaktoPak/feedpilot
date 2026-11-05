@@ -1,0 +1,201 @@
+{
+  "manifest_version": "0.3",
+  "name": "feedpilot",
+  "display_name": "Feedpilot",
+  "version": "0.1.0",
+  "description": "Run your Instagram accounts from Claude: connect any account, post and schedule.",
+  "long_description": "Feedpilot connects your Instagram accounts (personal, Creator or Business) to Claude Desktop. Each account signs in once in its own browser window. Then you can post and schedule photos, carousels and reels on several accounts at once, follow stats, read and answer DMs and comments, and ask Claude what to post next. Every post, reply and delete needs your approval, and everything stays on your computer. Feedpilot works through instagram.com rather than an official Instagram API.",
+  "author": {
+    "name": "Feedpilot contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "instagram",
+    "social media",
+    "scheduling",
+    "posting"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/dist/index.js"
+      ],
+      "env": {
+        "FEEDPILOT_DATA_DIR": "${user_config.data_dir}",
+        "FEEDPILOT_MAX_POSTS_PER_DAY": "${user_config.max_posts_per_day}",
+        "FEEDPILOT_MAX_PARALLEL": "${user_config.max_parallel}",
+        "FEEDPILOT_MAX_REPLIES_PER_HOUR": "${user_config.max_replies_per_hour}",
+        "FEEDPILOT_STORE_MESSAGES": "${user_config.store_messages}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "connect_account",
+      "description": "Open a sign-in window to connect an Instagram account."
+    },
+    {
+      "name": "check_connection",
+      "description": "Check whether the user finished signing in."
+    },
+    {
+      "name": "list_accounts",
+      "description": "List connected accounts and their sign-in status."
+    },
+    {
+      "name": "get_overview",
+      "description": "See every account at a glance: today's posts, what's scheduled, what needs attention."
+    },
+    {
+      "name": "check_account",
+      "description": "Confirm one account, or all of them at once, is still signed in."
+    },
+    {
+      "name": "disconnect_account",
+      "description": "Remove an account's saved sign-in."
+    },
+    {
+      "name": "list_media",
+      "description": "List photos and videos in the media folders."
+    },
+    {
+      "name": "preview_post",
+      "description": "Check posts for one or several accounts and get one preview to approve."
+    },
+    {
+      "name": "create_post",
+      "description": "Publish or schedule the approved posts."
+    },
+    {
+      "name": "test_post",
+      "description": "Run the posting steps without publishing."
+    },
+    {
+      "name": "get_post_status",
+      "description": "See where a post or a whole batch stands, with links."
+    },
+    {
+      "name": "list_scheduled",
+      "description": "List upcoming posts and ones needing attention."
+    },
+    {
+      "name": "reschedule_post",
+      "description": "Move a post to a new time."
+    },
+    {
+      "name": "cancel_post",
+      "description": "Cancel a scheduled post."
+    },
+    {
+      "name": "sync_stats",
+      "description": "Refresh followers and post stats for one account or all of them."
+    },
+    {
+      "name": "get_account_stats",
+      "description": "Followers, growth and post totals per account, side by side."
+    },
+    {
+      "name": "get_post_stats",
+      "description": "Each recent post's likes, comments, views and first-day numbers."
+    },
+    {
+      "name": "get_inbox",
+      "description": "Read every account's DMs and requests without marking anything seen."
+    },
+    {
+      "name": "send_reply",
+      "description": "Send a reply you approved in an existing chat."
+    },
+    {
+      "name": "forget_messages",
+      "description": "Delete the messages Feedpilot saved on this computer."
+    },
+    {
+      "name": "get_comments",
+      "description": "Read comments on recent posts across accounts."
+    },
+    {
+      "name": "reply_comment",
+      "description": "Reply to a comment, after your approval."
+    },
+    {
+      "name": "like_comment",
+      "description": "Like a comment, after your approval."
+    },
+    {
+      "name": "delete_comment",
+      "description": "Delete a comment on your own post, after your approval."
+    },
+    {
+      "name": "background_helper",
+      "description": "Explain, install (with approval), check or remove the background helper."
+    },
+    {
+      "name": "get_activity",
+      "description": "See what Feedpilot did recently."
+    },
+    {
+      "name": "get_setup_status",
+      "description": "Show Feedpilot's folder, browser and helper status."
+    },
+    {
+      "name": "install_browser",
+      "description": "Download Chromium when no Chrome or Edge is installed."
+    }
+  ],
+  "user_config": {
+    "data_dir": {
+      "type": "directory",
+      "title": "Data folder",
+      "description": "Where Feedpilot keeps sign-ins, media folders and its records.",
+      "default": "${HOME}/Feedpilot",
+      "required": false
+    },
+    "max_posts_per_day": {
+      "type": "number",
+      "title": "Daily post limit per account",
+      "description": "Feedpilot refuses to schedule more posts than this on one account in one day.",
+      "default": 5,
+      "min": 1,
+      "max": 25,
+      "required": false
+    },
+    "max_parallel": {
+      "type": "number",
+      "title": "Accounts at once",
+      "description": "How many accounts Feedpilot works on at the same time, each in its own browser window.",
+      "default": 3,
+      "min": 1,
+      "max": 5,
+      "required": false
+    },
+    "max_replies_per_hour": {
+      "type": "number",
+      "title": "Replies per account per hour",
+      "description": "Feedpilot refuses to send more DM replies than this from one account in an hour.",
+      "default": 20,
+      "min": 1,
+      "max": 60,
+      "required": false
+    },
+    "store_messages": {
+      "type": "boolean",
+      "title": "Save messages for analysis",
+      "description": "Keep a copy of DMs on this computer so Claude can spot patterns over time.",
+      "default": true,
+      "required": false
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin"
+    ],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  },
+  "prompts_generated": true
+}
